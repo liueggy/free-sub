@@ -6,7 +6,7 @@ SUB_URL = os.environ.get('SUB_URL', 'https://proxypool1999.banyunxiaoxi.icu/')
 TEST_URL = os.environ.get('TEST_URL', 'https://www.gstatic.com/generate_204')
 MH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mihomo')
 WORK = '/tmp/mhwork'
-OUT = 'out'
+OUT = '.'
 
 
 def fetch(url):
@@ -285,7 +285,7 @@ FINAL,PROXY
     rep.append('|---|---|---|---|')
     for n in uniq[:40]:
         rep.append(f"| {res[n['name']]}ms | {n['name']} | {n['type']} | {n['server']}:{n['port']} |")
-    open(os.path.join(OUT, 'README.md'), 'w').write("\n".join(rep) + "\n")
+    open('status.md', 'w').write("\n".join(rep) + "\n")
     print('输出完成:', len(uniq), '节点')
 
 
