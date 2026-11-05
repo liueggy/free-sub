@@ -43,7 +43,7 @@ jobs:
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add out
+          git add clash.yaml surge.conf nodes.txt status.md
           if git diff --cached --quiet; then
             echo "无变化"
           else
