@@ -1,0 +1,52 @@
+name: update-subscription
+
+on:
+  schedule:
+    - cron: '17 20 * * *'   # 每天 20:17 UTC = 04:17 CST
+  workflow_dispatch:        # 支持手动触发（也用来防止 60 天无活动被停用）
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-sub
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download mihomo
+        run: |
+          set -e
+          cd scripts
+          curl -fsSL -o m.gz https://github.com/MetaCubeX/mihomo/releases/download/v1.19.33/mihomo-linux-amd64-v1.19.33.gz
+          gunzip -f m.gz
+          mv m mihomo
+          chmod +x mihomo
+          ./mihomo -v
+
+      - name: Test nodes and build outputs
+        env:
+          SUB_URL: ${{ vars.SUB_URL || 'https://proxypool1999.banyunxiaoxi.icu/' }}
+        run: python3 scripts/gen_ci.py
+
+      - name: Commit results
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add out
+          if git diff --cached --quiet; then
+            echo "无变化"
+          else
+            git commit -m "chore: refresh subscription $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
